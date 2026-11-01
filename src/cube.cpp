@@ -21,6 +21,7 @@ struct CubeGeometry {
     std::vector<unsigned int> indices;
 };
 
+//Tex coords, where in the png assets maps to the "position" of the vertex.
 Vertex makeVertex(const glm::vec3& position, const glm::vec2& texCoord)
 {
     Vertex vertex;
@@ -31,10 +32,10 @@ Vertex makeVertex(const glm::vec3& position, const glm::vec2& texCoord)
 
 CubeGeometry makeCube()
 {
-    constexpr glm::vec2 bottomLeft(0.0f, 0.0f);
-    constexpr glm::vec2 bottomRight(1.0f, 0.0f);
+    constexpr glm::vec2 bottomLeft(0.5f, 0.5f);
+    constexpr glm::vec2 bottomRight(1.0f, 0.5f);
     constexpr glm::vec2 topRight(1.0f, 1.0f);
-    constexpr glm::vec2 topLeft(0.0f, 1.0f);
+    constexpr glm::vec2 topLeft(0.5f, 1.0f);
 
     CubeGeometry cube;
     cube.vertices = {

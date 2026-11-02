@@ -1,5 +1,4 @@
 #include <glad/gl.h> // Must be first!
-#include <glad/gl.h>
 #include <SFML/Window.hpp>
 #include <SFML/System/Clock.hpp>
 #include <glm/gtc/matrix_transform.hpp>

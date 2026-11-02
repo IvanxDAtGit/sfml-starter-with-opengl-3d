@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 #include <glad/gl.h> // Must be first!
+=======
+#include <glad/gl.h>
+>>>>>>> Stashed changes
 #include <SFML/Window.hpp>
 #include <SFML/System/Clock.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,6 +19,7 @@
 
 #include "mesh.h"
 
+<<<<<<< Updated upstream
 static constexpr float pi = 3.14159265358979323846f;
 
 namespace
@@ -216,3 +221,14 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+=======
+namespace {
+struct CylinderGeometry {
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+};
+
+
+}
+static constexpr float pi = 3.14159265358979323846f;
+>>>>>>> Stashed changes

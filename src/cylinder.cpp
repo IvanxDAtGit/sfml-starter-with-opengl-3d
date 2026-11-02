@@ -17,42 +17,36 @@
 
 static constexpr float pi = 3.14159265358979323846f;
 
-namespace
-{
-
-    struct CylinderGeometry
-    {
+namespace{
+    struct CylinderGeometry{
         std::vector<Vertex> verticies;
         std::vector<unsigned int> indicies;
     };
 
-    void rotate(Mesh &mesh, float radians)
-    {
+    void rotate(Mesh &mesh, float radians){
         mesh.applyTransform(glm::rotate(glm::mat4(1.0f),
                                         radians,
-                                        glm::vec3(3.0f, 1.0f, 0.0f)));
-    }
+                                        glm::vec3(3.0f, 1.0f, 0.0f)));}
 
     // Most of the code for cylinder mirrors a sphere, we just dont curve inwards at the ends, but stack straight up
-    CylinderGeometry makeCyliner(unsigned int slices, unsigned int stacks)
-    {
+    CylinderGeometry makeCyliner(unsigned int slices, unsigned int stacks){
         CylinderGeometry cylinder;
-        cylinder.verticies.reserve(static_cast<float>(stacks + 1) * static_cast<float>(slices + 1));
-        for (unsigned int slice = 0; slice <= slices; ++slice)
-        {
+        cylinder.verticies.reserve(static_cast<std::size_t>(stacks + 1) * (slices + 1));
+        cylinder.indicies.reserve(static_cast<std::size_t>(stacks) * slices * 6);
+        for (unsigned int slice = 0; slice <= slices; ++slice){
             // v represents which slice we are working on
             const float v = static_cast<float>(slice) / static_cast<float>(slices);
             const float radians = v * 2 * pi;
             const float x = std::cos(radians);
             const float z = std::sin(radians);
-            // Since we are doing a cylinder, we can treat the normal the same as a circle (= (x,y)/||x,y)|| at x,y)
 
+            // Since we are doing a cylinder, we can treat the normal the same as a circle (= (x,y)/||x,y)|| at x,y)
             const glm::vec3 normal(x, 0, z);
-            for (unsigned int stack = 0; stack <= stacks; ++stack)
-            {
+
+            for (unsigned int stack = 0; stack <= stacks; ++stack){
                 Vertex vertex;
                 const float y = static_cast<float>(stack) / static_cast<float>(stacks);
-                const glm::vec3 pos(x, y, z);
+                const glm::vec3 pos(x, 2*pi*y, z); //2pi to account for a square needing height = width(circumference), counter the stretch
 
                 vertex.position = pos;
                 vertex.normal = normal;
@@ -61,29 +55,25 @@ namespace
                 vertex.texCoord = glm::vec2(v, y);
                 cylinder.verticies.push_back(vertex);
             }
-
-            const unsigned int height = stacks + 1;
-
-            for (unsigned int slice = 0; slice < slices; ++slice)
-            {
-                const unsigned int leftSide = slice * height;
-                const unsigned int rightSide = leftSide + height;
-                for (unsigned int stack = 0; stack < stacks; ++stack)
-                {
-                    const unsigned int bottomLeft = leftSide + stack;
-                    const unsigned int bottomRight = rightSide + stack;
-                    const unsigned int topLeft = bottomLeft + 1;
-                    const unsigned int topRight = bottomRight + 1;
-
-                    cylinder.indicies.insert(cylinder.indicies.end(),
-                                             {bottomLeft, bottomRight, topRight,
-                                              bottomLeft, topRight, topLeft});
-                }
-            }
-
-            return cylinder;
-            // This will be
         }
+
+        const unsigned int height = stacks + 1;
+
+        for (unsigned int slice = 0; slice < slices; ++slice){
+            const unsigned int leftSide = slice * height;
+            const unsigned int rightSide = leftSide + height;
+            for (unsigned int stack = 0; stack < stacks; ++stack){
+                const unsigned int bottomLeft = leftSide + stack;
+                const unsigned int bottomRight = rightSide + stack;
+                const unsigned int topLeft = bottomLeft + 1;
+                const unsigned int topRight = bottomRight + 1;
+
+                cylinder.indicies.insert(cylinder.indicies.end(),
+                                         {bottomLeft, bottomRight, topRight,
+                                          bottomLeft, topRight, topLeft});
+            }
+        }
+        return cylinder;
     }
 }
 
@@ -192,7 +182,7 @@ int main(int argc, char *argv[])
             const float limitingAspect = std::min(aspectRatio, 1.0f);
             const float limitingHalfFov = std::atan(
                 std::tan(fieldOfView * 0.5f) * limitingAspect);
-            const float cameraDistance = cylinderRadius / std::sin(limitingHalfFov) * 2.0f;
+            const float cameraDistance = cylinderRadius / std::sin(limitingHalfFov) * 5.0f;
             const glm::mat4 view = glm::lookAt(cameraTarget + glm::vec3(0.0f,
                                                                         0.0f,
                                                                         cameraDistance),

@@ -1,5 +1,6 @@
 build
 out
+src/sphere.cpp
 .cache
 .idea
 .vs

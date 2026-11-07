@@ -75,6 +75,58 @@ namespace{
         }
         return cylinder;
     }
+
+    void cylTop(CylinderGeometry* openCyl, unsigned int wedges) {
+        openCyl->verticies.reserve(wedges + 1);
+        openCyl->indicies.reserve(3 * wedges);
+        unsigned int start = static_cast<unsigned int>(openCyl->verticies.size());
+
+        //Centre dot
+        Vertex centre;
+        glm::vec3 p = glm::vec3(0, 0, 0);
+        glm::vec3 n = glm::vec3(0, 1, 0);
+        glm::vec2 tC = glm::vec2(0.5f, 0.5f);
+        centre.position = p;
+        centre.normal = n;
+        centre.texCoord = tC;
+        
+        openCyl->verticies.push_back(centre);
+
+        for (unsigned int wedge = 0; wedge < wedges; ++wedge) {
+            const float theta = static_cast<float>(wedge) * 2 * pi / static_cast<float>(wedges);
+            const float x = std::cos(theta);
+            const float z = std::sin(theta);
+            Vertex vertex;
+            const glm::vec3 pos(x, 0, z);
+            const glm::vec3 up(0, 1.0f, 0);
+
+            vertex.position = pos;
+            vertex.normal = up;
+            vertex.texCoord = glm::vec2(0.5 + x, 0.5 + z);
+
+            openCyl->verticies.push_back(vertex);
+
+
+        }
+        
+        for (unsigned int wedge = 0; wedge < wedges; ++wedge) {
+            const unsigned int index = start + wedge + 1;
+            if (index + 1 < start + wedges + 1) {
+                openCyl->indicies.insert(
+                    openCyl->indicies.end(),
+                    { start,  index, index + 1 });
+            }
+
+            else {
+                openCyl->indicies.insert(
+                    openCyl->indicies.end(),
+                    { start,  index, start + 1});
+            }
+                
+        }
+        
+    }
+
 }
 
 int main(int argc, char *argv[])
@@ -116,6 +168,7 @@ int main(int argc, char *argv[])
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         CylinderGeometry cylinder = makeCyliner(64, 32);
+        cylTop(&cylinder, 64);
         const std::filesystem::path shaderDirectory =
             std::filesystem::absolute(argv[0]).parent_path() / "shaders";
         Material material;
